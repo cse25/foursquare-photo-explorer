@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
+  <script>
+    var app = angular.module('myApp', []);
+
+    app.controller('MainController', function($scope, $http) {
+      $scope.baseURL = 'https://api.foursquare.com/v2/';
+      $scope.CLIENT_ID = '4J5SDI15NYMIYAWN3GRFVGDVRYHWVZH54WW5VUFQDS5EUOWU';
+      $scope.CLIENT_SECRET = 'JLLRJIGNPYJ0S0OPZ2DPKAZ30JYC5XOZF4LILGIVETCPNA4B';
+      $scope.venues = [];
+      $scope.images = [];
+
+      $scope.findVenues = function(searchTerm) {
+        var URL = $scope.baseURL + 'venues/search?client_id=' + $scope.CLIENT_ID + '&client_secret=' + $scope.CLIENT_SECRET + '&v=20130815&near=santa_monica,ca&venuePhotos=1&query=' + searchTerm;
+        $http({
+          method: 'GET',
+          url: URL
+        }).then(function successCallback(response) {
+          $scope.venues = response.data.response.venues;
+          $scope.searchTerm = '';
+        }, function errorCallback(response) {
+          console.log('error');
+        });
+      }
+
+      $scope.getPhotos = function(venueId) {
+        var URL = $scope.baseURL + 'venues/' + venueId + '/photos?client_id=' + $scope.CLIENT_ID + '&client_secret=' + $scope.CLIENT_SECRET + '&v=20130815&limit=15';
+        $http({
+          method: 'GET',
+          url: URL
+        }).then(function successCallback(response) {
+          $scope.photos = response.data.response.photos.items;
+          if ($scope.photos.length) {
+            $scope.images = $scope.photos.map(function(photo) {
+              return photo.prefix + '400x300' + photo.suffix;
+            })
+          } else {
+            console.log('No Photos Found');
+          }
+        }, function errorCallback(response) {
+          console.log('Error: ' + response);
+        });
+      }
+    });
+  </script>
+
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+  <style media="screen" type="text/css">
+
+    a.list-group-item {
+      color: black;
+    }
+
+    body {
+      padding-top: 39px;
+      overflow: hidden;
+    }
+
+    .btn {
+      color:black;
+    }
+
+    .col-lg-3 {
+      padding-top: 15px;
+      padding-right: 0px;
+    }
+
+    .tab-pane {
+      height:99%;
+      overflow-y:scroll;
+      width:100%;
+      position:absolute;
+    }
+
+    .title {
+      padding-left: 18px;
+    }
+
+    .venue-title {
+      color: #337ab7;
+    }
+
+    .welcome-message {
+      background-color: #990000;
+      color: white;
+      text-align: center;
+    }
+
+  </style>
+</head>
+
+<body ng-app="myApp">
+  <div ng-controller="MainController">
+    
+    <!-- Nav Bar -->
+    <nav class="bg-primary navbar-fixed-top">
+      <form class="navbar-form form-inline">
+        <input class="form-control" ng-model="searchTerm" type="text" placeholder="ex: sushi, bakery">
+        <button ng-click="findVenues(searchTerm)" class="btn btn-info-outline" type="submit">Search</button>
+      </form>
+    </nav>
+
+    <!-- Welcome Message -->
+    <h3 href="#" class="welcome-message venue-item list-group-item" ng-if="(venues.length === 0)">Explore Santa Monica and Los Angeles through photos with the FourSquare API</h3>
+    
+      <!-- List of Venues -->
+      <div class="container-fluid">
+        <div class="row tab-pane"> 
+          <ol class="list-group col-lg-3 col-md-4 col-xs-6">
+            <li>
+              <a href="#" class="list-group-item" ng-click="getPhotos(venue.id)" type="text" ng-repeat="venue in venues | limitTo:10">
+                <address>
+                  <strong class="venue-title">{{ venue.name }}</strong>
+                  <br>
+                  {{ venue.location.address }}
+                  <br>
+                  {{ venue.location.city }}, {{ venue.location.state }} {{ venue.location.postalCode }}
+                  <br>
+                  {{ venue.contact.formattedPhone }}
+                </address>
+              </a>
+            </li>
+          </ol>
+
+        <!-- Image Gallery -->
+        <div class="container-fluid">
+          <div class="row">
+            <div ng-repeat="image in images" class="col-lg-3 col-md-4 col-xs-6">
+              <img class="img-responsive" ng-src="{{ image }}" />
+            </div>
+          </div> 
+        </div>
+
+      </div>
+    </div>
+  </div>
+</body>
+</html>
