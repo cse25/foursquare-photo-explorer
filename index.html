@@ -31,7 +31,7 @@
 
       // Implementation
       function findVenues (searchTerm) {
-        var URL = vm.baseURL + 'venues/search?client_id=' + vm.CLIENT_ID + '&client_secret=' + vm.CLIENT_SECRET + '&v=20130815&near=santa_monica,ca&venuePhotos=1&query=' + searchTerm
+        var URL = vm.baseURL + 'venues/search?client_id=' + vm.CLIENT_ID + '&client_secret=' + vm.CLIENT_SECRET + '&v=20130815&near=los_angeles,ca&venuePhotos=1&query=' + searchTerm
         $http({
           method: 'GET',
           url: URL
@@ -123,7 +123,7 @@
     </nav>
 
     <!-- Welcome Message -->
-    <h3 href="#" class="welcome-message venue-item list-group-item" ng-if="(vm.venues.length === 0)">Explore Santa Monica and Los Angeles through photos with the FourSquare API</h3>
+    <h3 href="#" class="welcome-message venue-item list-group-item" ng-if="(vm.venues.length === 0)">Explore Los Angeles through photos with the FourSquare API</h3>
     
       <!-- List of Venues -->
       <div class="container-fluid">
